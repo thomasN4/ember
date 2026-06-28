@@ -71,7 +71,8 @@ dotnet build AndroidApp1/AndroidApp1.csproj -t:Run -f net10.0-android \
 
 ## Status & known issues
 Built and running on-device. A few features still want on-device tuning/verification — see the
-[Issues](../../issues) tab. Contributor/agent notes live in [AGENTS.md](AGENTS.md).
+[Issues](../../issues) tab. To hack on it, see [CONTRIBUTING.md](CONTRIBUTING.md); deeper
+contributor/agent notes live in [AGENTS.md](AGENTS.md).
 
 ## Credits
 - Original `ember.html` by **Claude Fable**.
