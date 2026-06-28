@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             x:Class="AndroidApp1.MainPage"
+             BackgroundColor="{StaticResource Void}">
+
+    <Grid x:Name="Root">
+
+        <!-- Ember animation -->
+        <skia:SKCanvasView x:Name="Canvas" PaintSurface="OnPaintSurface" InputTransparent="True" />
+
+        <!-- full-screen tap catcher: opens the panel. A (near-)transparent, hit-testable view;
+             the overlays above are collapsed (IsVisible=False) when idle so taps reach this. -->
+        <BoxView x:Name="TapCatcher" Color="#01000000">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnTapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- opening hint -->
+        <Label x:Name="HintLabel"
+               Text="tap anywhere for controls"
+               TextColor="{StaticResource AmberDim}"
+               FontSize="12" CharacterSpacing="3"
+               HorizontalOptions="Center" VerticalOptions="Start"
+               Margin="0,22,0,0" Opacity="0" InputTransparent="True" />
+
+        <!-- phase word -->
+        <Label x:Name="PhaseLabel"
+               Text=""
+               TextColor="{StaticResource AmberDim}"
+               FontFamily="EmberSerif" FontSize="34" CharacterSpacing="12"
+               HorizontalOptions="Center" VerticalOptions="End"
+               Margin="0,0,0,120" Opacity="0" InputTransparent="True" />
+
+        <!-- dim scrim: catches "tap outside" to dismiss the panel -->
+        <BoxView x:Name="Scrim"
+                 BackgroundColor="{StaticResource Scrim}"
+                 Opacity="0" IsVisible="False">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnScrimTapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- consolidated control panel, low-center -->
+        <Border x:Name="Panel"
+                HorizontalOptions="Fill" VerticalOptions="End"
+                Margin="12,0,12,80" Padding="16,14"
+                Opacity="0" IsVisible="False"
+                BackgroundColor="{StaticResource PanelFill}"
+                Stroke="{StaticResource PanelStroke}" StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="22" />
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="12">
+                <!-- rhythm chips (built in code-behind) -->
+                <HorizontalStackLayout x:Name="RhythmRow" Spacing="8" HorizontalOptions="Center" />
+
+                <!-- dimmer -->
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Label Text="DIM" TextColor="{StaticResource AmberDim}" FontSize="11"
+                           CharacterSpacing="2" VerticalOptions="Center" />
+                    <Slider x:Name="Dimmer" Minimum="0.25" Maximum="1" Value="0.85" WidthRequest="190"
+                            ValueChanged="OnDimChanged"
+                            MinimumTrackColor="{StaticResource Amber}"
+                            MaximumTrackColor="{StaticResource AmberDim}"
+                            ThumbColor="{StaticResource Amber}" VerticalOptions="Center" />
+                    <Label Text="BRIGHT" TextColor="{StaticResource AmberDim}" FontSize="11"
+                           CharacterSpacing="2" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <!-- sleep timer (chips built in code-behind) -->
+                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="sleep" TextColor="{StaticResource AmberDim}" FontSize="11"
+                           CharacterSpacing="2" VerticalOptions="Center" />
+                    <HorizontalStackLayout x:Name="SleepRow" Spacing="6" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <!-- utilities -->
+                <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                    <Button x:Name="WordsButton" Text="hide words" Clicked="OnToggleWords"
+                            BackgroundColor="Transparent" TextColor="{StaticResource AmberDim}" FontSize="12" />
+                    <Button x:Name="FullscreenButton" Text="enter fullscreen" Clicked="OnToggleFullscreen"
+                            BackgroundColor="Transparent" TextColor="{StaticResource AmberDim}" FontSize="12" />
+                    <Button x:Name="HapticsButton" Text="haptics off" Clicked="OnToggleHaptics"
+                            BackgroundColor="Transparent" TextColor="{StaticResource AmberDim}" FontSize="12" />
+                </HorizontalStackLayout>
+
+                <!-- rhythm info (own row so it can't be squeezed out) -->
+                <Button x:Name="InfoButton" Text="what the rhythms mean" Clicked="OnInfoClicked"
+                        BackgroundColor="Transparent" TextColor="{StaticResource AmberDim}"
+                        FontSize="12" HorizontalOptions="Center"
+                        BorderColor="{StaticResource PanelStroke}" BorderWidth="1"
+                        CornerRadius="16" Padding="18,9" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- info card: explains the rhythms (tap to dismiss) -->
+        <Grid x:Name="InfoOverlay" BackgroundColor="{StaticResource Scrim}"
+              Opacity="0" IsVisible="False">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnInfoTapped" />
+            </Grid.GestureRecognizers>
+            <Border HorizontalOptions="Center" VerticalOptions="Center"
+                    Margin="28" Padding="24,22"
+                    BackgroundColor="{StaticResource PanelFill}"
+                    Stroke="{StaticResource PanelStroke}" StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="22" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="the rhythms" TextColor="{StaticResource Candle}"
+                           FontFamily="EmberSerif" FontSize="22" CharacterSpacing="4"
+                           HorizontalOptions="Center" />
+
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="slow exhale · 4·2·6·2" TextColor="{StaticResource Amber}" FontSize="14" />
+                        <Label Text="A longer exhale than inhale leans the body toward rest: in 4, hold 2, out 6, rest 2."
+                               TextColor="{StaticResource AmberDim}" FontSize="13" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="4 · 7 · 8" TextColor="{StaticResource Amber}" FontSize="14" />
+                        <Label Text="Dr. Weil's relaxing breath: in 4, hold 7, out 8. The long hold and exhale settle a busy mind."
+                               TextColor="{StaticResource AmberDim}" FontSize="13" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="box · 4·4·4·4" TextColor="{StaticResource Amber}" FontSize="14" />
+                        <Label Text="Equal counts — in, hold, out, hold. Steady and grounding; used to stay calm under pressure."
+                               TextColor="{StaticResource AmberDim}" FontSize="13" />
+                    </VerticalStackLayout>
+
+                    <Label Text="tap to close" TextColor="{StaticResource AmberDim}" FontSize="11"
+                           CharacterSpacing="2" Opacity="0.7" HorizontalOptions="Center" Margin="0,4,0,0" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- black overlay for the sleep-timer fade-out (tap to wake) -->
+        <BoxView x:Name="FadeOverlay" Color="Black" Opacity="0" IsVisible="False">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnFadeTapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+    </Grid>
+</ContentPage>

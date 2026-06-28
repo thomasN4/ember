@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AndroidApp1.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Ember palette (from ember.html :root) -->
+            <Color x:Key="Void">#0d0705</Color>
+            <Color x:Key="AmberDim">#9a6840</Color>
+            <Color x:Key="Amber">#d49558</Color>
+            <Color x:Key="Candle">#f2b566</Color>
+
+            <!-- control surfaces (kept dim/translucent for night use) -->
+            <Color x:Key="PanelFill">#E60F0805</Color>
+            <Color x:Key="PanelStroke">#40d49558</Color>
+            <Color x:Key="Scrim">#80000000</Color>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

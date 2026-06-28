@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net10.0-android</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <UseMaui>true</UseMaui>
+        <SingleProject>true</SingleProject>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+
+        <RootNamespace>AndroidApp1</RootNamespace>
+        <ApplicationTitle>Ember</ApplicationTitle>
+        <ApplicationId>com.companyname.AndroidApp1</ApplicationId>
+        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+
+        <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- App icon: reuses the original foreground art on a warm-black background -->
+        <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#0d0705" />
+
+        <!-- Splash screen -->
+        <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#0d0705" BaseSize="128,128" />
+
+        <!-- Custom fonts -->
+        <MauiFont Include="Resources\Fonts\*" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0" />
+    </ItemGroup>
+
+</Project>

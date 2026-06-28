@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ember — a breathing pacer for sleep</title>
+<style>
+  :root {
+    --void: #0d0705;
+    --amber-dim: #9a6840;
+    --amber: #d49558;
+    --candle: #f2b566;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: var(--void);
+    overflow: hidden;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* phase word */
+  #phase {
+    position: fixed;
+    left: 50%;
+    bottom: 18%;
+    transform: translateX(-50%);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    letter-spacing: 0.35em;
+    text-transform: lowercase;
+    color: var(--amber-dim);
+    opacity: 0;
+    transition: opacity 1.6s ease;
+    pointer-events: none;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* controls */
+  #controls {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(94vw, 30rem);
+    padding: 1rem 1.2rem calc(1.2rem + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+  #controls.visible { opacity: 1; pointer-events: auto; }
+
+  .row { display: flex; gap: 0.5rem; justify-content: center; align-items: center; flex-wrap: wrap; }
+
+  .rhythm {
+    background: rgba(212, 149, 88, 0.06);
+    border: 1px solid rgba(212, 149, 88, 0.22);
+    color: var(--amber-dim);
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+  }
+  .rhythm.active {
+    background: rgba(212, 149, 88, 0.16);
+    color: var(--candle);
+    border-color: rgba(242, 181, 102, 0.5);
+  }
+  .rhythm:focus-visible, #fs:focus-visible, #words:focus-visible {
+    outline: 1px solid var(--candle);
+    outline-offset: 2px;
+  }
+
+  .util {
+    background: none;
+    border: none;
+    color: var(--amber-dim);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    padding: 0.4rem 0.7rem;
+    opacity: 0.8;
+  }
+  .util:hover { color: var(--candle); }
+
+  /* dimmer */
+  .dim-wrap { display: flex; align-items: center; gap: 0.7rem; justify-content: center; }
+  .dim-label { color: var(--amber-dim); font-size: 0.7rem; letter-spacing: 0.15em; opacity: 0.7; }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 9rem;
+    height: 2px;
+    background: rgba(212, 149, 88, 0.25);
+    border-radius: 1px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    cursor: pointer;
+    border: none;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    cursor: pointer;
+    border: none;
+  }
+
+  #hint {
+    position: fixed;
+    top: 1.4rem;
+    width: 100%;
+    text-align: center;
+    color: var(--amber-dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    opacity: 0;
+    transition: opacity 2s ease;
+    pointer-events: none;
+    text-transform: lowercase;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="phase"></div>
+<div id="hint">tap anywhere for controls</div>
+
+<div id="controls">
+  <div class="row" id="rhythms"></div>
+  <div class="dim-wrap">
+    <span class="dim-label">DIM</span>
+    <input type="range" id="dimmer" min="0.25" max="1" step="0.01" value="0.85" aria-label="Screen brightness">
+    <span class="dim-label">BRIGHT</span>
+  </div>
+  <div class="row">
+    <button class="util" id="words">hide words</button>
+    <button class="util" id="fs">enter fullscreen</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const phaseEl = document.getElementById('phase');
+const controls = document.getElementById('controls');
+const hint = document.getElementById('hint');
+
+let W, H, DPR;
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* ---------- rhythms ---------- */
+const RHYTHMS = [
+  { name: 'slow exhale', steps: [['breathe in', 4], ['hold', 2], ['let go', 6], ['rest', 2]] },
+  { name: '4 · 7 · 8',   steps: [['breathe in', 4], ['hold', 7], ['let go', 8]] },
+  { name: 'box',         steps: [['breathe in', 4], ['hold', 4], ['let go', 4], ['rest', 4]] },
+];
+let rhythm = RHYTHMS[0];
+
+/* phase value: 0 = exhaled, 1 = inhaled */
+function smooth(t) { t = Math.min(Math.max(t, 0), 1); return t * t * (3 - 2 * t); }
+
+function breathState(time) {
+  const total = rhythm.steps.reduce((s, x) => s + x[1], 0);
+  let t = time % total;
+  let level = 0; // current fill level entering this step
+  for (const [name, dur] of rhythm.steps) {
+    if (t < dur) {
+      let p;
+      if (name === 'breathe in')      p = smooth(t / dur);
+      else if (name === 'let go')     p = 1 - smooth(t / dur);
+      else                             p = level; // hold / rest keep the level
+      return { p, name };
+    }
+    if (name === 'breathe in') level = 1;
+    else if (name === 'let go') level = 0;
+    t -= dur;
+  }
+  return { p: 0, name: 'rest' };
+}
+
+/* ---------- embers (drifting warm motes) ---------- */
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motes = [];
+const N_MOTES = reducedMotion ? 0 : 40;
+for (let i = 0; i < N_MOTES; i++) {
+  motes.push({
+    x: Math.random(), y: Math.random(),
+    r: 0.6 + Math.random() * 1.4,
+    vy: -(0.004 + Math.random() * 0.01),  // gentle rise, like sparks
+    vx: (Math.random() - 0.5) * 0.004,
+    tw: Math.random() * Math.PI * 2,
+    tws: 0.3 + Math.random() * 0.6,
+  });
+}
+
+/* ---------- render ---------- */
+let dim = 0.85;
+let showWords = true;
+let lastPhaseName = '';
+const start = performance.now();
+
+function draw(now) {
+  const time = (now - start) / 1000;
+  const { p, name } = breathState(time);
+
+  // background: warm near-black vertical gradient
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, `rgba(${10 * dim}, ${5 * dim}, ${3 * dim}, 1)`);
+  bg.addColorStop(1, `rgba(${24 * dim}, ${11 * dim}, ${5 * dim}, 1)`);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H * 0.46;
+  const minDim = Math.min(W, H);
+  const R = minDim * (0.085 + 0.13 * p);
+
+  // wide halo
+  const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 3.2);
+  const hAlpha = (0.10 + 0.14 * p) * dim;
+  halo.addColorStop(0, `rgba(232, 140, 60, ${hAlpha})`);
+  halo.addColorStop(1, 'rgba(232, 140, 60, 0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, W, H);
+
+  // core: ember -> candlelight as it fills
+  const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  const r1 = 242, g1 = 181 - 50 * (1 - p), b1 = 102 - 60 * (1 - p); // candle to deep ember
+  core.addColorStop(0, `rgba(${r1 * dim}, ${Math.max(g1, 60) * dim}, ${Math.max(b1, 20) * dim}, ${0.85 * dim})`);
+  core.addColorStop(0.7, `rgba(${196 * dim}, ${88 * dim}, ${28 * dim}, ${0.5 * dim})`);
+  core.addColorStop(1, 'rgba(196, 88, 28, 0)');
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+
+  // motes
+  for (const m of motes) {
+    m.y += m.vy / 60; m.x += m.vx / 60;
+    if (m.y < -0.02) { m.y = 1.02; m.x = Math.random(); }
+    if (m.x < -0.02) m.x = 1.02;
+    if (m.x > 1.02) m.x = -0.02;
+    const tw = 0.25 + 0.2 * Math.sin(time * m.tws + m.tw);
+    ctx.fillStyle = `rgba(${230 * dim}, ${150 * dim}, ${70 * dim}, ${tw * dim * 0.55})`;
+    ctx.beginPath();
+    ctx.arc(m.x * W, m.y * H, m.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // phase words
+  if (name !== lastPhaseName) {
+    lastPhaseName = name;
+    if (showWords) {
+      phaseEl.style.opacity = 0;
+      setTimeout(() => {
+        phaseEl.textContent = name;
+        phaseEl.style.opacity = 0.85;
+      }, 400);
+    }
+  }
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+/* ---------- controls ---------- */
+const rhythmRow = document.getElementById('rhythms');
+RHYTHMS.forEach((r, i) => {
+  const b = document.createElement('button');
+  b.className = 'rhythm' + (i === 0 ? ' active' : '');
+  b.textContent = r.name + '  ' + r.steps.map(s => s[1]).join('·');
+  b.onclick = () => {
+    rhythm = r;
+    document.querySelectorAll('.rhythm').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  };
+  rhythmRow.appendChild(b);
+});
+
+document.getElementById('dimmer').addEventListener('input', e => { dim = +e.target.value; });
+
+const wordsBtn = document.getElementById('words');
+wordsBtn.onclick = () => {
+  showWords = !showWords;
+  wordsBtn.textContent = showWords ? 'hide words' : 'show words';
+  phaseEl.style.opacity = showWords ? 0.85 : 0;
+};
+
+const fsBtn = document.getElementById('fs');
+fsBtn.onclick = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+};
+document.addEventListener('fullscreenchange', () => {
+  fsBtn.textContent = document.fullscreenElement ? 'exit fullscreen' : 'enter fullscreen';
+});
+
+/* auto-hide controls after idle */
+let hideTimer;
+function showControls() {
+  controls.classList.add('visible');
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => controls.classList.remove('visible'), 4500);
+}
+['pointerdown', 'pointermove', 'keydown'].forEach(ev =>
+  document.addEventListener(ev, showControls, { passive: true })
+);
+
+/* opening hint, fades after a few seconds */
+setTimeout(() => { hint.style.opacity = 0.7; }, 800);
+setTimeout(() => { hint.style.opacity = 0; }, 6000);
+
+/* keep the screen awake during a session, if the browser allows it */
+let wakeLock = null;
+async function requestWake() {
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+}
+if ('wakeLock' in navigator) {
+  requestWake();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') requestWake();
+  });
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&display=swap" rel="stylesheet">
+</body>
+</html>
