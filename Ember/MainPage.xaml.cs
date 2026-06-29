@@ -5,7 +5,7 @@ using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Storage;
 using SkiaSharp.Views.Maui;
 
-namespace AndroidApp1;
+namespace Ember;
 
 public partial class MainPage : ContentPage
 {

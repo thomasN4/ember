@@ -52,7 +52,7 @@ Requirements:
 Deploy to a connected device and launch:
 
 ```bash
-dotnet build AndroidApp1/AndroidApp1.csproj -t:Run -f net10.0-android \
+dotnet build Ember/Ember.csproj -t:Run -f net10.0-android \
   -p:JavaSdkDirectory=/path/to/jdk-21 -p:AdbTarget=-d
 ```
 
@@ -62,11 +62,11 @@ dotnet build AndroidApp1/AndroidApp1.csproj -t:Run -f net10.0-android \
 > `-p:EmbedAssembliesIntoApk=true`.
 
 ## Project layout
-- `AndroidApp1/EmberRenderer.cs` — the SkiaSharp port of the canvas animation (rhythms, breath
+- `Ember/EmberRenderer.cs` — the SkiaSharp port of the canvas animation (rhythms, breath
   curve, motes, gradients).
-- `AndroidApp1/MainPage.xaml` / `.xaml.cs` — the UI overlays and all interaction.
-- `AndroidApp1/MauiProgram.cs`, `App.xaml` — app bootstrap, palette, font registration.
-- `AndroidApp1/Platforms/Android/` — MAUI Android entry points and the manifest.
+- `Ember/MainPage.xaml` / `.xaml.cs` — the UI overlays and all interaction.
+- `Ember/MauiProgram.cs`, `App.xaml` — app bootstrap, palette, font registration.
+- `Ember/Platforms/Android/` — MAUI Android entry points and the manifest.
 - `ember.html` — the original web app, kept for reference.
 
 ## Status & known issues

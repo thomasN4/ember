@@ -11,7 +11,7 @@ change is simple: does it keep things calm, dim, and unobtrusive?
 Build, deploy to a device, and launch:
 
 ```bash
-dotnet build AndroidApp1/AndroidApp1.csproj -t:Run -f net10.0-android \
+dotnet build Ember/Ember.csproj -t:Run -f net10.0-android \
   -p:JavaSdkDirectory=/path/to/jdk-21 -p:AdbTarget=-d
 ```
 

@@ -2,7 +2,7 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 
-namespace AndroidApp1;
+namespace Ember;
 
 [Activity(
     Theme = "@style/Maui.SplashTheme",

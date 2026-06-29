@@ -1,4 +1,4 @@
-namespace AndroidApp1;
+namespace Ember;
 
 public partial class App : Application
 {

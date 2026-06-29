@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidApp1", "AndroidApp1\AndroidApp1.csproj", "{C9CEF62E-6E4C-455F-AAE9-CC809E07240D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember", "Ember\Ember.csproj", "{C9CEF62E-6E4C-455F-AAE9-CC809E07240D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

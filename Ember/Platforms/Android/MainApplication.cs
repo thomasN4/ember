@@ -1,7 +1,7 @@
 using Android.App;
 using Android.Runtime;
 
-namespace AndroidApp1;
+namespace Ember;
 
 [Application]
 public class MainApplication : MauiApplication

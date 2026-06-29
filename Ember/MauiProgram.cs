@@ -1,6 +1,6 @@
 using SkiaSharp.Views.Maui.Controls.Hosting;
 
-namespace AndroidApp1;
+namespace Ember;
 
 public static class MauiProgram
 {

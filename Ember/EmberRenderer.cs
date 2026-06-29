@@ -1,6 +1,6 @@
 using SkiaSharp;
 
-namespace AndroidApp1;
+namespace Ember;
 
 /// <summary>A breathing rhythm: a named sequence of (label, seconds) steps.</summary>
 public sealed class Rhythm

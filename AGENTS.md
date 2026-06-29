@@ -14,7 +14,7 @@ ember. It's a **sleep app**, so the guiding aesthetic is dim, low-contrast, and 
 - Needs the **MAUI Android workload**: `dotnet workload install maui-android`.
 - Deploy and launch on a connected device:
   ```bash
-  dotnet build AndroidApp1/AndroidApp1.csproj -t:Run -f net10.0-android \
+  dotnet build Ember/Ember.csproj -t:Run -f net10.0-android \
     -p:JavaSdkDirectory=<jdk-21> -p:AdbTarget=-d
   ```
 - **Debug = Fast Deployment.** Assemblies are pushed separately, so a bare `adb install` crashes

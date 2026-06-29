@@ -8,9 +8,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
 
-        <RootNamespace>AndroidApp1</RootNamespace>
+        <RootNamespace>Ember</RootNamespace>
         <ApplicationTitle>Ember</ApplicationTitle>
-        <ApplicationId>com.companyname.AndroidApp1</ApplicationId>
+        <ApplicationId>com.companyname.Ember</ApplicationId>
         <ApplicationVersion>1</ApplicationVersion>
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 
@@ -29,6 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0" />
     </ItemGroup>
