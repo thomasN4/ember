@@ -3,7 +3,7 @@
 A breathing pacer for sleep — a calm, full-screen ember you breathe with in the dark.
 
 <p align="center">
-  <img src="docs/hero.png" width="270" alt="Ember — the breathing glow with the phase word 'hold'">
+  <img src="docs/hero.gif" width="270" alt="Ember — the breathing glow growing and shrinking through a slow-exhale cycle">
 </p>
 
 Ember began as a single self-contained web page, `ember.html`, written by Claude Fable. This
@@ -31,9 +31,9 @@ on the exhale**, with drifting spark "motes" and fading phase words (*breathe in
 - Remembers your settings between launches; keeps the screen awake during a session.
 
 <p align="center">
-  <img src="docs/panel.png" width="260" alt="The control panel">
+  <img src="docs/panel.gif" width="260" alt="The control panel, with the ember still breathing behind it">
   &nbsp;&nbsp;
-  <img src="docs/info.png" width="260" alt="The rhythm info card">
+  <img src="docs/info.gif" width="260" alt="The rhythm info card">
 </p>
 
 ## The rhythms
