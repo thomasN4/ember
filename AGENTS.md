@@ -59,3 +59,43 @@ ember. It's a **sleep app**, so the guiding aesthetic is dim, low-contrast, and 
 - Verify changes on a real device and screenshot. Remember that **haptics** (feel), the
   **sleep-timer fade** (needs minutes), and **backlight DIM** (framebuffer) can't be confirmed by
   screenshot alone.
+
+## Recreating the README screenshots/GIFs (`docs/*.gif`)
+The three `docs/*.gif` files are real on-device captures, not mockups. To redo one after a UI
+change:
+
+1. Deploy the current build to a connected device (see Build & run) and let it settle on the
+   idle ember — tap the scrim area (anywhere outside the panel) to dismiss any open panel first.
+2. Get exact tap coordinates instead of eyeballing them from a screenshot:
+   `adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml` dumps every view's
+   `bounds="[x1,y1][x2,y2]"` (button text is in there too, so it's easy to find e.g. "what the
+   rhythms mean"). The device used for the originals is 720×1600 (`adb shell wm size`); rescale
+   if capturing on a different device. `adb` may not be on `PATH` — on the original dev machine
+   it's `~/Android/Sdk/platform-tools/adb`.
+3. Capture with `adb shell screenrecord --bit-rate 12000000 --time-limit <secs> /sdcard/x.mp4`,
+   then `adb pull`. Useful durations:
+   - **hero** (idle ember, no UI): capture exactly one breath cycle so the GIF loops seamlessly —
+     `Rhythm.Total` seconds (slow exhale = 14s, 4·7·8 = 19s, box = 16s). Check which rhythm is
+     currently selected first: `adb shell run-as com.companyname.Ember sh -c 'cat
+     /data/data/com.companyname.Ember/shared_prefs/*.xml'` (look at `rhythmIndex`). Any
+     exactly-one-period window loops cleanly because the breath curve is a pure function of
+     `time mod Total` — but the background motes drift independently of the phase clock, so
+     they'll show a small jump at the seam regardless of trim point.
+   - **panel**: the menu auto-dismisses 4.5s after it last sees interaction (`_hideTimer` in
+     `MainPage.xaml.cs`), so keep the clip at ~4.5s or under or it'll catch the close-fade.
+   - **info**: no auto-dismiss, so duration is flexible. Tap to open the panel, then tap the info
+     button ~0.3–0.4s later (enough for layout) to catch the panel→info transition in one take.
+4. Convert with `ffmpeg`. Blur the status bar to match the existing privacy treatment (it shows
+   real notifications/battery/time) by cropping the top ~70px, blurring, and overlaying it back;
+   then trim to the window picked in step 3 and reduce to a reasonable GIF frame rate:
+   ```bash
+   ffmpeg -i in.mp4 -ss <start> -t <dur> -filter_complex \
+     "[0:v]split=2[main][top];[top]crop=720:70:0:0,boxblur=16:2:chroma_radius=16:chroma_power=2[blurtop];[main][blurtop]overlay=0:0,fps=20[v]" \
+     -map "[v]" blurred.mp4
+   ffmpeg -i blurred.mp4 -vf "palettegen=stats_mode=diff" palette.png
+   ffmpeg -i blurred.mp4 -i palette.png -lavfi "paletteuse=dither=sierra2_4a" -loop 0 out.gif
+   ```
+5. Sanity-check a couple of extracted frames before committing (first vs. last frame for hero,
+   to confirm the loop seam lines up), then drop the result into `docs/` under the filename the
+   README already references. Multi-MB GIFs are an accepted tradeoff here — don't downscale
+   resolution/duration to chase a smaller file unless asked.
