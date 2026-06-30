@@ -1,0 +1,11 @@
+<Project>
+
+    <!--
+      Optional machine-specific overrides (e.g. JavaSdkDirectory, pinned to JDK 21 — see
+      AGENTS.md / error XA0030). Copy Directory.Build.local.props.example to
+      Directory.Build.local.props and fill it in; that file is git-ignored, so each contributor
+      can point at their own JDK without passing -p:JavaSdkDirectory=... on every build.
+    -->
+    <Import Project="Directory.Build.local.props" Condition="Exists('Directory.Build.local.props')" />
+
+</Project>

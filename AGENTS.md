@@ -8,9 +8,11 @@ animation is drawn with SkiaSharp; the UI is a tap-to-open control panel over a 
 ember. It's a **sleep app**, so the guiding aesthetic is dim, low-contrast, and minimal.
 
 ## Build & run (read this first)
-- **JDK 21 is required.** Newer JDKs fail the Android build with `error XA0030`. Pass
-  `-p:JavaSdkDirectory=<jdk-21>` (on the original dev machine that was
-  `/usr/lib/jvm/java-21-amazon-corretto`), or configure it in the IDE's Android settings.
+- **JDK 21 is required.** Newer JDKs fail the Android build with `error XA0030`. Either copy
+  `Directory.Build.local.props.example` to `Directory.Build.local.props` (git-ignored) and set
+  `JavaSdkDirectory` there once, or pass `-p:JavaSdkDirectory=<jdk-21>` per build (on the
+  original dev machine that was `/usr/lib/jvm/java-21-amazon-corretto`), or configure it in the
+  IDE's Android settings.
 - Needs the **MAUI Android workload**: `dotnet workload install maui-android`.
 - Deploy and launch on a connected device:
   ```bash

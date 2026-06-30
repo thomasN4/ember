@@ -1,0 +1,12 @@
+<Project>
+
+    <!--
+      Copy this file to Directory.Build.local.props (git-ignored) and point JavaSdkDirectory at
+      a JDK 21 install. The .NET Android SDK rejects newer JDKs with error XA0030, and without
+      this you'd need to pass -p:JavaSdkDirectory=... on every build/run command.
+    -->
+    <PropertyGroup>
+        <JavaSdkDirectory>/path/to/jdk-21</JavaSdkDirectory>
+    </PropertyGroup>
+
+</Project>

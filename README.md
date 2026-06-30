@@ -47,14 +47,17 @@ Requirements:
 - **.NET 10 SDK** with the **MAUI Android workload** — `dotnet workload install maui-android`.
 - **Android SDK** and a connected device (or a real-GPU emulator).
 - **JDK 21** — the .NET Android SDK rejects newer JDKs (`error XA0030`). Point the build at a
-  JDK 21 via `-p:JavaSdkDirectory=…`, or set it in your IDE's Android settings.
+  JDK 21 either by copying [`Directory.Build.local.props.example`](Directory.Build.local.props.example)
+  to `Directory.Build.local.props` (git-ignored) and filling in `JavaSdkDirectory`, by passing
+  `-p:JavaSdkDirectory=…` on the command line, or by setting it in your IDE's Android settings.
 
 Deploy to a connected device and launch:
 
 ```bash
-dotnet build Ember/Ember.csproj -t:Run -f net10.0-android \
-  -p:JavaSdkDirectory=/path/to/jdk-21 -p:AdbTarget=-d
+dotnet build Ember/Ember.csproj -t:Run -f net10.0-android -p:AdbTarget=-d
 ```
+
+(Add `-p:JavaSdkDirectory=/path/to/jdk-21` too if you haven't set up `Directory.Build.local.props`.)
 
 > **Note:** Debug builds use **Fast Deployment** — the .NET assemblies are pushed to the device
 > separately, so a bare `adb install` of the APK crashes with *"No assemblies found…"*. Always
