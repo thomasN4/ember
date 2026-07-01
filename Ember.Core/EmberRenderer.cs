@@ -68,14 +68,14 @@ public sealed class EmberRenderer
         }
     }
 
-    private static double Smooth(double t)
+    internal static double Smooth(double t)
     {
         t = Math.Min(Math.Max(t, 0), 1);
         return t * t * (3 - 2 * t);
     }
 
     // phase value: 0 = exhaled, 1 = inhaled
-    private (double P, string Name) BreathState(double time)
+    internal (double P, string Name) BreathState(double time)
     {
         double total = Rhythm.Total;
         double t = time % total;

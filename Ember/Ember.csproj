@@ -34,4 +34,8 @@
         <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Ember.Core\Ember.Core.csproj" />
+    </ItemGroup>
+
 </Project>
