@@ -87,13 +87,6 @@
                     <Button x:Name="HapticsButton" Text="haptics off" Clicked="OnToggleHaptics"
                             BackgroundColor="Transparent" TextColor="{StaticResource AmberDim}" FontSize="12" />
                 </HorizontalStackLayout>
-
-                <!-- rhythm info (own row so it can't be squeezed out) -->
-                <Button x:Name="InfoButton" Text="what the rhythms mean" Clicked="OnInfoClicked"
-                        BackgroundColor="Transparent" TextColor="{StaticResource AmberDim}"
-                        FontSize="12" HorizontalOptions="Center"
-                        BorderColor="{StaticResource PanelStroke}" BorderWidth="1"
-                        CornerRadius="16" Padding="18,9" />
             </VerticalStackLayout>
         </Border>
 

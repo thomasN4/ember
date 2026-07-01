@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Dispatching;
+using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Storage;
 using SkiaSharp.Views.Maui;
 
@@ -130,14 +131,43 @@ public partial class MainPage : ContentPage
         for (int i = 0; i < EmberRenderer.Rhythms.Length; i++)
         {
             var r = EmberRenderer.Rhythms[i];
-            var btn = MakeChip($"{r.Name}  {r.Cadence}");
+            var btn = MakeChip(r.Cadence);
             int idx = i;
             btn.Clicked += (_, _) => { SelectRhythm(idx); KeepOpen(); };
             _rhythmButtons.Add(btn);
             RhythmRow.Add(btn);
         }
         SelectRhythm(sel);
+
+        var infoIcon = MakeIconButton("i");
+        infoIcon.GestureRecognizers.Add(new TapGestureRecognizer
+        {
+            Command = new Command(() => OnInfoClicked(infoIcon, EventArgs.Empty)),
+        });
+        RhythmRow.Add(infoIcon);
     }
+
+    private static Border MakeIconButton(string glyph) => new()
+    {
+        WidthRequest = 30,
+        HeightRequest = 30,
+        Padding = 0,
+        // Near-transparent, not Colors.Transparent: fully transparent views don't reliably
+        // hit-test taps on Android here (same reason TapCatcher uses #01000000).
+        BackgroundColor = Color.FromArgb("#01000000"),
+        Stroke = AmberDim,
+        StrokeThickness = 1,
+        StrokeShape = new RoundRectangle { CornerRadius = 15 },
+        Content = new Label
+        {
+            Text = glyph,
+            TextColor = AmberDim,
+            FontSize = 14,
+            FontAttributes = FontAttributes.Italic,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+        },
+    };
 
     private void SelectRhythm(int index)
     {
