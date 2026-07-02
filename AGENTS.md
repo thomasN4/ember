@@ -24,10 +24,16 @@ ember. It's a **sleep app**, so the guiding aesthetic is dim, low-contrast, and 
   Release or add `-p:EmbedAssembliesIntoApk=true`.
 
 ## Environment notes
-- **The headless Android emulator does not work in the original dev environment** — the guest
-  kernel boots, but the host SwiftShader renderer segfaults during composition (reproducible
-  across every `-gpu` mode, with and without the build sandbox). Use a **physical device** or a
-  **windowed emulator backed by a real GPU**.
+- **The Android emulator needs host-GPU rendering here.** On the default `auto`/SwiftShader path
+  the guest kernel boots but the host renderer segfaults during composition (while allocating
+  `VK_FORMAT_R8G8B8A8_UNORM` ColorBuffers), so it never reaches `sys.boot_completed` and never
+  registers with adb. Forcing the emulator onto the **host GPU (`-gpu host`)** fixes it — the AVD
+  boots and runs normally. Set it persistently in Rider/Android Studio Device Manager (edit the
+  AVD → **Graphics: Hardware — GLES 2.0**) or pass `-gpu host` at launch; the last known-good run
+  recorded `hw.gpu.mode = host` in the AVD's `hardware-qemu.ini`. A **physical device over USB**
+  works too and sidesteps the question. Note: don't leave a stale emulator running alongside a
+  USB device — with two adb targets, `adb` (and the Fast Deployment step) errors *"more than one
+  device/emulator"* and Rider's run hangs.
 - `adb exec-out screencap -p` captures the framebuffer, **not** the physical backlight — so the
   real-backlight DIM behaviour can't be confirmed from a screenshot.
 

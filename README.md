@@ -45,7 +45,9 @@ on the exhale**, with drifting spark "motes" and fading phase words (*breathe in
 
 Requirements:
 - **.NET 10 SDK** with the **MAUI Android workload** — `dotnet workload install maui-android`.
-- **Android SDK** and a connected device (or a real-GPU emulator).
+- **Android SDK** and a connected device, or an emulator using **host-GPU rendering** (set the
+  AVD's Graphics to *Hardware — GLES 2.0*, i.e. `-gpu host`). The default software/SwiftShader
+  path can crash on boot on some Linux hosts.
 - **JDK 21** — the .NET Android SDK rejects newer JDKs (`error XA0030`). Point the build at a
   JDK 21 either by copying [`Directory.Build.local.props.example`](Directory.Build.local.props.example)
   to `Directory.Build.local.props` (git-ignored) and filling in `JavaSdkDirectory`, by passing
